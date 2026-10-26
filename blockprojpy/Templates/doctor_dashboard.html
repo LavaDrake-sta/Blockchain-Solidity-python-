@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="he">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Dashboard</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #1e1e2f;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        /* מיכל לוח הבקרה */
+        .dashboard-container {
+            background-color: #2a2a3d;
+            padding: 30px;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 800px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+            margin-bottom: 40px;
+        }
+
+        /* כותרות */
+        h2,
+        h3 {
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        /* עיצוב לטפסים */
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #b5b5c3;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 8px;
+            background-color: #39395c;
+            color: white;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: #b5b5c3;
+        }
+
+        /* כפתורים */
+        button {
+            width: 100%;
+            padding: 14px;
+            margin-top: 10px;
+            background-color: #28a745;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            background-color: #1e7e34;
+            transform: translateY(0);
+        }
+
+        /* עיצוב כפתורי חיבור */
+        .connect-button {
+            background-color: #007bff;
+            margin-top: 10px;
+        }
+
+        .connect-button:hover {
+            background-color: #0069d9;
+        }
+
+        .connect-button:active {
+            background-color: #005cbf;
+        }
+
+        /* כפתור יציאה */
+        .logout-button {
+            background-color: #dc3545;
+            margin-top: 20px;
+        }
+
+        .logout-button:hover {
+            background-color: #c82333;
+        }
+
+        .logout-button:active {
+            background-color: #bd2130;
+        }
+
+        /* רספונסיביות */
+        @media (max-width: 768px) {
+            .dashboard-container {
+                padding: 20px;
+                max-width: 90%;
+            }
+
+            input,
+            textarea {
+                font-size: 14px;
+            }
+
+            button {
+                font-size: 14px;
+                padding: 12px;
+            }
+
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <h2>Doctor Dashboard</h2>
+        <h3>Patient Details</h3>
+        <form id="addPatientForm" method="post">
+            <label for="patient_name">שם המטופל:</label>
+            <input type="text" id="patient_name" name="patient_name" placeholder="הכנס שם מטופל" required>
+
+            <label for="patient_id">תעודת זהות:</label>
+            <input type="text" id="patient_id" name="patient_id" placeholder="הכנס תעודת זהות" required>
+
+            <label for="patient_age">גיל המטופל:</label>
+            <input type="number" id="patient_age" name="patient_age" placeholder="הכנס גיל" required>
+
+            <label for="treatment_details">פרטי טיפול:</label>
+            <textarea id="treatment_details" name="treatment_details" placeholder="הכנס פרטי טיפול" required></textarea>
+
+            <!-- כפתורי חיבור ל-MetaMask ול-Ganache -->
+            <button type="button" class="connect-button" onclick="connectMetaMask()">התחבר ל-MetaMask</button>
+            <button type="button" class="connect-button" onclick="connectGanache()">התחבר ל-Ganache</button>
+
+            <!-- כפתור הוספת רשומת מטופל -->
+            <button type="submit" class="submit-button">הוסף רשומת מטופל</button>
+        </form>
+
+        <!-- כפתור יציאה מהמערכת -->
+        <button class="logout-button" onclick="logout()">יציאה מהמערכת</button>
+    </div>
+
+    <script>
+        // פונקציה לחיבור ל-MetaMask
+        async function connectMetaMask() {
+            if (window.ethereum) {
+                try {
+                    await ethereum.request({ method: 'eth_requestAccounts' });
+                    alert('התחברת ל-MetaMask בהצלחה!');
+                } catch (error) {
+                    console.error('שגיאה בהתחברות ל-MetaMask', error);
+                    alert('התחברות ל-MetaMask נכשלה');
+                }
+            } else {
+                alert('נא להתקין MetaMask!');
+            }
+        }
+
+        // פונקציה לחיבור ל-Ganache
+        async function connectGanache() {
+            try {
+                const web3 = new Web3(new Web3.providers.HttpProvider('http://127.0.0.1:7545'));
+                const accounts = await web3.eth.getAccounts();
+                alert('התחברת ל-Ganache בהצלחה!');
+            } catch (error) {
+                console.error('שגיאה בהתחברות ל-Ganache', error);
+                alert('התחברות ל-Ganache נכשלה');
+            }
+        }
+
+        // פונקציה ליציאה מהמערכת
+        function logout() {
+            window.location.href = '/logout';
+        }
+    </script>
+</body>
+
+</html>

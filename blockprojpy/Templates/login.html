@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOM/z8KL5KJpt4NoJGzTzS5q5D1Xp9K4e8d4de6C" crossorigin="anonymous">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #1e1e2f;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: #fff;
+        }
+        .login-container {
+            background: linear-gradient(145deg, #2a2a3d, #232336);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2), -5px -5px 15px rgba(255, 255, 255, 0.1);
+            width: 100%;
+            max-width: 350px;
+            box-sizing: border-box;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .login-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 8px 8px 20px rgba(0, 0, 0, 0.3), -8px -8px 20px rgba(255, 255, 255, 0.1);
+        }
+        .login-container h2 {
+            margin-bottom: 20px;
+            font-size: 28px;
+            text-align: center;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        .login-container label {
+            display: block;
+            margin-bottom: 8px;
+            color: #bbb;
+            font-weight: bold;
+        }
+        .login-container input[type="text"],
+        .login-container input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #3a3a4a;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+            background-color: #2b2b3d;
+            color: #fff;
+            transition: border-color 0.3s ease;
+        }
+        .login-container input[type="text"]:focus, 
+        .login-container input[type="password"]:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+        .login-container button {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-container button:hover {
+            background-color: #0056b3;
+            transform: translateY(-3px);
+        }
+        .login-container button i {
+            margin-right: 8px;
+            font-size: 18px;
+        }
+        .message {
+            margin-top: 15px;
+            font-size: 14px;
+            text-align: center;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        .message.success {
+            color: #28a745;
+        }
+        .message.error {
+            color: #dc3545;
+        }
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>Login</h2>
+        <form method="POST">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" placeholder="Enter username" required>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" placeholder="Enter password" required>
+            <button type="submit"><i class="fas fa-sign-in-alt"></i> Login</button>
+        </form>
+        <div class="message">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <p class="message {{ 'success' if 'success' in message else 'error' }}">{{ message }}</p>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+    </div>
+</body>
+</html>

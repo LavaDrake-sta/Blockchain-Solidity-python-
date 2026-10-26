@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #1e1e2f;
+            margin: 0;
+            padding: 20px;
+            color: #fff;
+        }
+        h2 {
+            font-size: 36px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .dashboard-container {
+            background: #2a2a3d;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 800px;
+            margin: auto;
+            margin-bottom: 20px;
+        }
+        input, select, button {
+            width: calc(100% - 20px);
+            margin-bottom: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #3a3a4a;
+            background-color: #39395c;
+            color: white;
+            font-size: 16px;
+        }
+        button {
+            background-color: #007bff;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .logout-container {
+            text-align: right;
+        }
+        .logout-container button {
+            background-color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flashes">
+          {% for category, message in messages %}
+            <li class="{{ category }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <div class="logout-container">
+        <button onclick="window.location.href='/logout'">Logout</button>
+    </div>
+
+    <h2>Admin Dashboard</h2>
+    <div class="dashboard-container">
+        <h3>Add Doctor</h3>
+        <form id="doctorForm" method="POST" action="{{ url_for('add_doctor_route') }}">
+            <input type="hidden" id="doctor_address" name="doctor_address">
+
+            <label for="doctor_id">Doctor ID:</label>
+            <input type="text" id="doctor_id" name="doctor_id" placeholder="Enter Doctor ID" required>
+
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" placeholder="Enter Username" required>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" placeholder="Enter Password" required>
+
+            <label for="specialty">Specialty:</label>
+            <input type="text" id="specialty" name="specialty" placeholder="Enter Specialty" required>
+
+            
+            <button type="submit">Add Doctor</button>
+            <button id="connect-metamask">Connect MetaMask</button>
+        </form>
+    </div>
+
+    <div class="dashboard-container">
+        <h3>Add Medication</h3>
+        <form method="POST" action="{{ url_for('admin_dashboard') }}">
+            <input type="hidden" name="add_medication" value="true">
+            <label for="medication_name">Medication Name:</label>
+            <input type="text" id="medication_name" name="medication_name" required>
+
+            <label for="dosage">Dosage:</label>
+            <input type="number" id="dosage" name="dosage" required>
+
+            <label for="stock">Stock:</label>
+            <input type="number" id="stock" name="stock" required>
+
+            <button type="submit">Add Medication</button>
+        </form>
+    </div>
+
+    <div class="dashboard-container">
+        <h3>רשימת רופאים</h3>
+        <table>
+            <tr>
+                <th>שם</th>
+                <th>תעודת זהות</th>
+                <th>התמחות</th>
+            </tr>
+            {% for doctor in doctors %}
+            <tr>
+                <td>{{ doctor.Name }}</td>
+                <td>{{ doctor.ID }}</td>
+                <td>{{ doctor.Specialty }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <div class="dashboard-container">
+        <h3>רשימת מטופלים</h3>
+        <table>
+            <tr>
+                <th>שם</th>
+                <th>תעודת זהות</th>
+                <th>גיל</th>
+                <th>כתובת</th>
+                <th>טלפון</th>
+                <th>פרטי טיפול</th>
+            </tr>
+            {% for patient in patients %}
+            <tr>
+                <td>{{ patient.Name }}</td>
+                <td>{{ patient.ID }}</td>
+                <td>{{ patient.Age }}</td>
+                <td>{{ patient.Address }}</td>
+                <td>{{ patient.Phone }}</td>
+                <td>{{ patient.Treatment_Details }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <div class="dashboard-container">
+        <h3>רשימת תרופות</h3>
+        <table>
+            <tr>
+                <th>שם</th>
+                <th>מינון</th>
+                <th>מלאי</th>
+                <th>תיאור</th>
+                <th>עריכה</th>
+            </tr>
+            {% for medication in medications %}
+            <tr>
+                <td>{{ medication.Name }}</td>
+                <td>{{ medication.Dosage }}</td>
+                <td>{{ medication.Stock }}</td>
+                <td>{{ medication.Description }}</td>
+                <td>
+                    <form method="POST" action="{{ url_for('edit_medication', id=medication.id) }}">
+                        <input type="number" name="new_stock" placeholder="ערוך מלאי">
+                        <button type="submit">עדכן</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <script>
+        async function connectMetaMask() {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+                    const account = accounts[0];
+    
+                    // שליחה של הכתובת לשרת Flask
+                    const response = await fetch('/connect_metamask', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ address: account })
+                    });
+    
+                    const data = await response.json();
+                    alert(data.message);
+                    if (data.success) {
+                        window.location.href = '/doctor_dashboard';
+                    }
+                } catch (error) {
+                    alert('Failed to connect MetaMask: ' + error.message);
+                }
+            } else {
+                alert('MetaMask is not installed. Please install MetaMask and try again.');
+            }
+        }
+    
+        document.getElementById('connect-metamask').addEventListener('click', connectMetaMask);
+    </script>
+
+</body>
+</html>
